@@ -1,0 +1,25 @@
+{
+  "name": "mrt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run query && npm run contour && npm run csv",
+    "query": "node query",
+    "contour": "node contour",
+    "csv": "node csv"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@turf/turf": "^4.5.2",
+    "async": "^2.5.0",
+    "axios": "^0.16.2",
+    "commander": "^2.11.0",
+    "d3": "^4.10.0",
+    "d3-contour": "^1.1.1",
+    "node-json": "github:yinshanyang/node-json",
+    "rxjs": "^5.4.1"
+  }
+}
