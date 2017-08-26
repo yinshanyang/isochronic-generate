@@ -42,7 +42,6 @@ const createSurface = (point) => {
     surface: data
   }))
   .catch(() => Observable.of(null))
-  .delay(1000)
 }
 
 const querySurface = ({ point, surface }) => {
