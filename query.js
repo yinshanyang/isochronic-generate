@@ -8,7 +8,7 @@ const json = require('node-json')
 
 program
   .version(require('./package.json').version)
-  .option('-p, --point-set', 'Path to source point set, `./data/point-set.geo.json`')
+  .option('-p, --point-set <path>', 'Path to source point set, `./data/point-set.geo.json`')
   .option('-o, --output <path>', 'Output directory `./output/raws`')
   .option('-a, --api <value>', 'API endpoint')
   .parse(process.argv)
