@@ -11,11 +11,13 @@ program
   .option('-p, --point-set <path>', 'Path to source point set, `./data/point-set.geo.json`')
   .option('-o, --output <path>', 'Output directory `./output/raws`')
   .option('-a, --api <value>', 'API endpoint')
+  .option('-b, --banned <value>', 'Comma seperated list of banned routes, e.g. 1_EW,1_NE, defaults to none')
   .parse(process.argv)
 
 const POINT_SET = program.pointSet || './data/point-set.geo.json'
 const OUTPUT = program.output || './output/raws'
 const API = program.api || 'http://192.168.33.10:8080/otp'
+const BANNED = program.banned || ''
 
 // utils
 const createSurface = (point) => {
@@ -28,7 +30,8 @@ const createSurface = (point) => {
     maxWalkDistance: 50000,
     layers: 'traveltime',
     mode: 'TRANSIT,WALK',
-    fromPlace: `${lat},${lon}`
+    fromPlace: `${lat},${lon}`,
+    bannedRoutes: BANNED
   })
 
   return Observable.fromPromise(
