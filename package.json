@@ -7,6 +7,7 @@
     "start": "npm run query && npm run contour && npm run csv",
     "query": "node query",
     "contour": "node contour",
+    "quantize": "node quantize",
     "csv": "node csv"
   },
   "keywords": [],
