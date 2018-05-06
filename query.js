@@ -24,14 +24,15 @@ const createSurface = (point) => {
   const { lat, lon } = point
   const query = qs.stringify({
     batch: true,
-    date: '06-01-2017',
+    date: '04-30-2018',
     time: '12:00pm',
+    styles: 'color30',
     cutoffMinutes: 360,
     maxWalkDistance: 50000,
     layers: 'traveltime',
     mode: 'TRANSIT,WALK',
     fromPlace: `${lat},${lon}`,
-    bannedRoutes: BANNED
+    toPlace: `${lat},${lon}`
   })
 
   return Observable.fromPromise(
@@ -71,8 +72,10 @@ const querySurface = ({ point, surface }) => {
 const formatResponse = ({ point, points: { times } }) =>
   Object.assign({}, point, { times })
 
-const saveOutput = (data) =>
+const saveOutput = (data) => {
   json.write(`${path.resolve(__dirname, OUTPUT)}/${data.id}.json`, data)
+  return data.id
+}
 
 // main
 const points = require(path.resolve(__dirname, POINT_SET)).features
@@ -83,16 +86,22 @@ const points = require(path.resolve(__dirname, POINT_SET)).features
   }))
 
 const surfaces$ = Observable.from(points)
-  // create isosurface on opentripplanner
-  .concatMap(createSurface)
-  .filter((d) => d)
-  // query for pointset
-  .concatMap(querySurface)
-  .filter((d) => d)
+  .concatMap((d) =>
+    Observable.of(d)
+      // create isosurface on opentripplanner
+      .concatMap(createSurface)
+      .filter((d) => d)
+      .do(({ point }) => console.log(`created: ${point.id}`))
+      // query for pointset
+      .concatMap(querySurface)
+      .filter((d) => d)
+      .do(({ point }) => console.log(`queried: ${point.id}`))
+  )
   // save pointset data
   .bufferCount(1)
   .map(([ data ]) => data)
   .map(formatResponse)
-  .do(saveOutput)
+  .map(saveOutput)
+  .do((id) => console.log(`saved:   ${id}`))
 
-surfaces$.subscribe(({ id }) => console.log(id))
+surfaces$.subscribe()
