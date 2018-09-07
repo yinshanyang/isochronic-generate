@@ -8,14 +8,12 @@ const json = require('node-json')
 
 program
   .version(require('./package.json').version)
-  .option('-p, --point-set', 'Path to source point set, `./data/point-set.geo.json`')
-  .option('-P, --point-grid', 'Path to source point grid, `./data/point-grid.geo.json`')
+  .option('-P, --point-grid <path>', 'Path to source point grid, `./data/point-grid.geo.json`')
   .option('-i, --input <path>', 'Input directory of responses from OpenTripPlanner, `./output/raws`')
   .option('-o, --output <path>', 'Output directory,`./output/contours`')
-  .option('-m, --minutes <value>', 'Number of minutes, `3`')
+  .option('-m, --minutes <value>', 'Number of minutes, `60`')
   .parse(process.argv)
 
-const POINT_SET = program.pointSet || './data/point-set.geo.json'
 const POINT_GRID = program.pointGrid || './data/point-grid.geo.json'
 const INPUT = program.input || './output/raws'
 const OUTPUT = program.output || './output/contours'
@@ -24,7 +22,7 @@ const MINUTES = program.minutes || 60
 // derived constants
 const WIDTH = require(path.resolve(__dirname, POINT_GRID)).properties.width
 const HEIGHT = require(path.resolve(__dirname, POINT_GRID)).properties.height
-const BBOX = turf.bbox(require(path.resolve(__dirname, POINT_SET)))
+const BBOX = turf.bbox(require(path.resolve(__dirname, POINT_GRID)))
 
 // utils
 const interpolate = ({ id, times: _times }) => {
@@ -97,14 +95,14 @@ const contour = ({ id, times }) => {
 }
 
 const saveOutput = ({ id, isobands }) =>
-  json.write(`${path.resolve(__dirname, OUTPUT)}/${id}.geo.json`, isobands)
+  json.format(`${path.resolve(__dirname, OUTPUT)}/${id}.geo.json`, isobands)
 
 // main
 const files = fs.readdirSync(path.resolve(__dirname, INPUT))
 
 const stream$ = Observable.from(files)
   .map((file) => `${path.resolve(__dirname, INPUT)}/${file}`)
-  .map(json.read)
+  .map(json.parse)
   .map(interpolate)
   .map(contour)
   .do(saveOutput)
