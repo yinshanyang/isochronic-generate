@@ -73,7 +73,7 @@ const formatResponse = ({ point, points: { times } }) =>
   Object.assign({}, point, { times })
 
 const saveOutput = (data) => {
-  json.write(`${path.resolve(__dirname, OUTPUT)}/${data.id}.json`, data)
+  json.format(`${path.resolve(__dirname, OUTPUT)}/${data.id}.json`, data)
   return data.id
 }
 
