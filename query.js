@@ -8,10 +8,16 @@ const json = require('node-json')
 
 program
   .version(require('./package.json').version)
-  .option('-p, --point-set <path>', 'Path to source point set, `./data/point-set.geo.json`')
+  .option(
+    '-p, --point-set <path>',
+    'Path to source point set, `./data/point-set.geo.json`'
+  )
   .option('-o, --output <path>', 'Output directory `./output/raws`')
   .option('-a, --api <value>', 'API endpoint')
-  .option('-b, --banned <value>', 'Comma seperated list of banned routes, e.g. 1_EW,1_NE, defaults to none')
+  .option(
+    '-b, --banned <value>',
+    'Comma seperated list of banned routes, e.g. 1_EW,1_NE, defaults to none'
+  )
   .parse(process.argv)
 
 const POINT_SET = program.pointSet || './data/point-set.geo.json'
@@ -41,17 +47,17 @@ const createSurface = (point) => {
       url: `${API}/surfaces?${query}`
     })
   )
-  .map(({ data }) => ({
-    point,
-    surface: data
-  }))
-  .catch(() => Observable.of(null))
+    .map(({ data }) => ({
+      point,
+      surface: data
+    }))
+    .catch(() => Observable.of(null))
 }
 
 const querySurface = ({ point, surface }) => {
   const { id } = surface
   const query = qs.stringify({
-    targets: 'point-grid',
+    targets: 'point-grid.clustered-postcodes',
     detail: true
   })
 
@@ -61,12 +67,12 @@ const querySurface = ({ point, surface }) => {
       url: `${API}/surfaces/${id}/indicator?${query}`
     })
   )
-  .map(({ data }) => ({
-    point,
-    surface,
-    points: data
-  }))
-  .catch(() => Observable.of(null))
+    .map(({ data }) => ({
+      point,
+      surface,
+      points: data
+    }))
+    .catch(() => Observable.of(null))
 }
 
 const formatResponse = ({ point, points: { times } }) =>
@@ -78,12 +84,13 @@ const saveOutput = (data) => {
 }
 
 // main
-const points = require(path.resolve(__dirname, POINT_SET)).features
-  .map((feature) => ({
+const points = require(path.resolve(__dirname, POINT_SET)).features.map(
+  (feature) => ({
     lat: feature.geometry.coordinates[1],
     lon: feature.geometry.coordinates[0],
     id: feature.properties.index
-  }))
+  })
+)
 
 const surfaces$ = Observable.from(points)
   .concatMap((d) =>
@@ -99,7 +106,7 @@ const surfaces$ = Observable.from(points)
   )
   // save pointset data
   .bufferCount(1)
-  .map(([ data ]) => data)
+  .map(([data]) => data)
   .map(formatResponse)
   .map(saveOutput)
   .do((id) => console.log(`saved:   ${id}`))
