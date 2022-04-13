@@ -15,7 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "@turf/turf": "^4.5.2",
-    "async": "^2.5.0",
+    "async": "^3.2.2",
     "axios": "^0.16.2",
     "commander": "^2.11.0",
     "d3": "^4.10.0",
